@@ -79,8 +79,17 @@ int main(int argc, char* argv[]) {
 
     zen::print("Time taken: ", second,"us\n");
 
-    zen::print("Recursive approach is faster than ierative by : ", second - first,"us");
+    timer.start();
+    MatMath::BlockedMul(matrix1,matrix2);   
+    timer.stop();
+    auto third = timer.duration<zen::timer::usec>().count();
+    zen::print("Time taken: ", third,"us\n");
     
+
+    zen::print("Recursive approach is faster than ierative by : ", second - first,"us\n");
+    zen::print("Blocked approach is faster than ierative by : ", third - first,"us\n");
+    zen::print("Recursive approach is faster than Blocked by : ", second - third,"us\n");
+
     
     return 0;
 }
