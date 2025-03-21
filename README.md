@@ -59,22 +59,22 @@ Once compiled, run the program to start the memory stress test:
 ```
 Sample output:
 ```
-Matrix Multiplication Performance (256x512 * 512x256)
+Multiplication Performance (1000x1000 * 1000x1000)
 +----------------------+------------+
 | Method               | Time (us)  |
 +----------------------+------------+
-| Recursive (matMul)   |     123456 |
-| Naive (multiply)     |     234567 |
-| Blocked (BlockedMul) |      98765 |
+| Recursive (matMul)   |     582054 |
+| Naive (multiply)     |    2656243 |
+| Blocked (BlockedMul) |     680559 |
 +----------------------+------------+
 
 Performance Factors (Ratio)
 +--------------------------------+------------+
 | Comparison                     | Factor     |
 +--------------------------------+------------+
-| Recursive vs. Naive            |       0.53 |
-| Blocked vs. Naive              |       0.42 |
-| Recursive vs. Blocked          |       1.25 |
+| Recursive vs. Naive            |       0.22 |
+| Blocked vs. Naive              |       0.26 |
+| Recursive vs. Blocked          |       0.86 |
 +--------------------------------+------------+
 ```
 
@@ -83,7 +83,7 @@ Performance Factors (Ratio)
 ### Matrix Structure
 - `Mat` struct: Simple row-major matrix representation
 - Dynamic size support via std::vector
-- BLOCK_SIZE set to 256 (configurable, 64 recommended for better cache performance)
+- BLOCK_SIZE set to sqrt((CacheDetector::getL1CacheSize()*1024)/12)
 
 
 ### Comparison of Algorithms
@@ -178,12 +178,12 @@ Performance Factors (Ratio)
 
 ### Practical Results from Your Code
 Based on your output table structure, typical results might look like this for a 512x512 matrix:
-- **Naive**: 234567 μs
-- **Recursive**: 123456 μs (faster than naive due to locality)
-- **Blocked**: 98765 μs (fastest due to cache optimization)
+- **Naive**: 582054 μs
+- **Recursive**: 2656243 μs (faster than naive due to locality)
+- **Blocked**: 680559 μs (fastest due to cache optimization)
 
 **Ratios**:
-- Recursive vs. Naive: ~0.53 (Recursive is ~2x faster)
-- Blocked vs. Naive: ~0.42 (Blocked is ~2.4x faster)
-- Recursive vs. Blocked: ~1.25 (R is ~25% faster than Recursive)
+- Recursive vs. Naive: ~0.22 (Recursive is ~5x faster)
+- Blocked vs. Naive: ~0.26 (Blocked is ~4x faster)
+- Recursive vs. Blocked: ~0.86 (Blocked is ~15% slower than Recursive)
 
