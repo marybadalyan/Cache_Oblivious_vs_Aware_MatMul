@@ -70,14 +70,14 @@ int main(int argc, char* argv[]) {
     MatMath::matMul(matrix1, matrix2);
     timer.stop();
     auto first = timer.duration<zen::timer::usec>().count();
-    zen::print("Time taken: ",first,"us");
+    zen::print("Time taken: ",first,"us\n");
     
     timer.start();
     multiply(matrix1.matrix, matrix2.matrix, row1,col2,col1);   
     timer.stop();
     auto second = timer.duration<zen::timer::usec>().count();
 
-    zen::print("Time taken: ", second,"us");
+    zen::print("Time taken: ", second,"us\n");
 
     zen::print("Recursive approach is faster than ierative by : ", second - first,"us");
     
