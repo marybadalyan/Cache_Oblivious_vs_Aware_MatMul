@@ -1,7 +1,8 @@
 #include <vector>
-#include <iostream>
 #include <algorithm>
-#include <stdexcept>
+#include "cache_size.h"
+
+const int BLOCK_SIZE = 64; //use 64 for better performance can use namespace CacheDetector::BLOCK_SIZE for L1 cache capacity
 
 namespace MatMath {
     struct Mat {
@@ -60,7 +61,7 @@ namespace MatMath {
         c2_end = std::min(c2_end, mat2.cols);
 
         // Base case
-        if (r1_size <= 16 || c1_size <= 16 || c2_size <= 16 || 
+        if (r1_size <= 64 || c1_size <= 64 || c2_size <= 64 || 
             r1_size <= 0 || c1_size <= 0 || c2_size <= 0) {
             MultiplyMat(result, mat1, mat2,
                         r1_start, r1_end, c1_start, c1_end,
@@ -115,9 +116,29 @@ namespace MatMath {
 
     // Wrapper
     Mat matMul(const Mat& mat1, const Mat& mat2) {
-        if (mat1.cols != mat2.rows) throw std::runtime_error("Matrix dimensions incompatible");
         Mat result(mat1.rows, mat2.cols);
         matMul(result, mat1, mat2, 0, mat1.rows, 0, mat1.cols, 0, mat2.rows, 0, mat2.cols, 0, 0);
+        return result;
+    }
+
+    Mat BlockedMul(const Mat& mat1, const Mat& mat2){
+        Mat result(mat1.rows, mat2.cols);
+        
+        for (int i = 0; i < mat1.rows; i += BLOCK_SIZE) {
+            for (int j = 0; j < mat2.cols; j += BLOCK_SIZE) {
+                for (int k = 0; k < mat1.cols; k += BLOCK_SIZE) {
+                    for (int ii = i; ii < std::min(i + BLOCK_SIZE, mat1.rows); ii++) {
+                        for (int jj = j; jj < std::min(j + BLOCK_SIZE, mat2.cols); jj++) {
+                            int sum = 0;
+                            for (int kk = k; kk < std::min(k + BLOCK_SIZE, mat1.cols); kk++) {
+                                sum += mat1.matrix[ii * mat1.cols + kk] * mat2.matrix[kk * mat2.cols + jj];
+                            }
+                            result.matrix[ii * result.cols + jj] += sum;
+                        }
+                    }
+                }
+            }
+        }
         return result;
     }
 }
