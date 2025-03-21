@@ -35,8 +35,6 @@ namespace CacheDetector {
 
         // First check CPUID leaf 2 (older method)
         getCpuid(2, 0, eax, ebx, ecx, edx);
-        std::cout << "CPUID Leaf 2: " << std::hex << "eax=" << eax << " ebx=" << ebx 
-                  << " ecx=" << ecx << " edx=" << edx << std::dec << "\n";
 
         uint8_t* descriptors = reinterpret_cast<uint8_t*>(&eax);
         for (int i = 0; i < 4; i++) {
@@ -62,8 +60,6 @@ namespace CacheDetector {
         if (size == 0) {
             for (uint32_t i = 0; i < 4; i++) {
                 getCpuid(0x4, i, eax, ebx, ecx, edx);  // Use sub-leaf index i
-                std::cout << "CPUID Leaf 4." << i << ": " << std::hex << "eax=" << eax 
-                          << " ebx=" << ebx << " ecx=" << ecx << " edx=" << edx << std::dec << "\n";
 
                 uint32_t cacheType = (eax & 0x1F);         // Cache type (0 = null, 1 = data, 3 = unified)
                 if (cacheType == 0) break;                 // No more caches to enumerate
@@ -74,7 +70,6 @@ namespace CacheDetector {
                     uint32_t line = (ebx & 0xFFF) + 1;          // Cache line size in bytes
                     uint32_t sets = ecx + 1;                    // Number of sets
                     size = (ways * line * sets) / 1024;        // Total size in KB
-                    std::cout << "Detected L1 cache size: " << size << " KB\n";
                     break;
                 }
             }
