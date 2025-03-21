@@ -2,14 +2,14 @@
 #include <algorithm>
 #include "cache_size.h"
 
-const int BLOCK_SIZE = 64; //use 64 for better performance can use namespace CacheDetector::BLOCK_SIZE for L1 cache capacity
+const int BLOCK_SIZE = 256; //use 64 for better performance can use namespace CacheDetector::BLOCK_SIZE for L1 cache capacity
 
+struct Mat {
+    int rows, cols;
+    std::vector<int> matrix;
+    Mat(int r, int c) : rows(r), cols(c), matrix(r * c, 0) {}
+};
 namespace MatMath {
-    struct Mat {
-        int rows, cols;
-        std::vector<int> matrix;
-        Mat(int r, int c) : rows(r), cols(c), matrix(r * c, 0) {}
-    };
 
     // Standard multiplication with direct access
     void MultiplyMat(Mat& result, const Mat& mat1, const Mat& mat2,
