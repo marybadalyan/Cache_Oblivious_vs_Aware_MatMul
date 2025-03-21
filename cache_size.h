@@ -80,7 +80,6 @@ namespace CacheDetector {
             std::cerr << "Warning: Could not detect L1 cache size, defaulting to 32 KB\n";
             size = 32;  // Reasonable default for modern CPUs
         }
-
         return size;
     }
 

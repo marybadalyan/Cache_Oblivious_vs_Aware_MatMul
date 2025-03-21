@@ -1,8 +1,8 @@
 #include <vector>
 #include <algorithm>
 #include "cache_size.h"
-
-const int BLOCK_SIZE = 256; //use 64 for better performance can use namespace CacheDetector::BLOCK_SIZE for L1 cache capacity
+#include <cmath>
+const int BLOCK_SIZE = sqrt((CacheDetector::getL1CacheSize()*1024)/12);
 
 struct Mat {
     int rows, cols;
