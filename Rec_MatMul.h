@@ -2,6 +2,8 @@
 #include <algorithm>
 #include "cache_size.h"
 #include <cmath>
+#include <thread>
+
 const int BLOCK_SIZE = sqrt((getL1CacheSize()*1024)/12);
 
 struct Mat {
@@ -121,6 +123,7 @@ namespace MatMath {
         return result;
     }
 
+    
     Mat BlockedMul(const Mat& mat1, const Mat& mat2){
         Mat result(mat1.rows, mat2.cols);
         
@@ -141,5 +144,34 @@ namespace MatMath {
         }
         return result;
     }
+ 
+    void BlockedMul_threading_helper(const Mat& mat1, const Mat& mat2, Mat& result, int BLOCK_SIZE, int i, int j) {
+        for (int k = 0; k < mat1.cols; k += BLOCK_SIZE) {
+            for (int ii = i; ii < (std::min)(i + BLOCK_SIZE, mat1.rows); ii++) {
+                for (int jj = j; jj < (std::min)(j + BLOCK_SIZE, mat2.cols); jj++) {
+                    int sum = 0;
+                    for (int kk = k; kk < (std::min)(k + BLOCK_SIZE, mat1.cols); kk++) {
+                        sum += mat1.matrix[ii * mat1.cols + kk] * mat2.matrix[kk * mat2.cols + jj];
+                    }
+                    result.matrix[ii * result.cols + jj] += sum;
+                }
+            }
+        }
+    }
+    
+    Mat BlockedMul_threading(const Mat& mat1, const Mat& mat2, int BLOCK_SIZE) {
+        Mat result(mat1.rows, mat2.cols);
+        std::vector<std::thread> threads;
+        for (int i = 0; i < mat1.rows; i += BLOCK_SIZE) {
+            for (int j = 0; j < mat2.cols; j += BLOCK_SIZE) {
+                threads.emplace_back(BlockedMul_threading_helper, 
+                                     std::ref(mat1), std::ref(mat2), std::ref(result), 
+                                     BLOCK_SIZE, i, j);
+            }
+        }
+        for (auto& t : threads) t.join();
+        return result;
+    }
+
 }
 
